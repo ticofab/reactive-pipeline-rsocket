@@ -1,0 +1,35 @@
+version: "3.4"
+
+# To start this file -> $ docker-compose up
+
+services:
+  #
+  # Kafka
+  #
+  kafka:
+    image: krisgeus/docker-kafka
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+    restart: "no"
+    environment:
+      LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
+      ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
+      SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      INTER_BROKER: "INTERNAL"
+      KAFKA_CREATE_TOPICS: "FirstTopic:1:1,SecondTopic:1:1"
+ 
+  #
+  # Kafka UI
+  # kafdrop accessible via: http://localhost:9093/
+  #
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9093:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    depends_on:
+      - "kafka"
