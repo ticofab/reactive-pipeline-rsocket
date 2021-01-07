@@ -6,6 +6,7 @@ import io.rsocket._
 import io.rsocket.core._
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util._
+import reactor.core.scheduler.Schedulers
 import reactor.util.retry.Retry
 
 import java.time.Duration
@@ -42,17 +43,12 @@ class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkSh
             val payload = grab(in)
 
             // do operation
-            socket
+            val ss = socket
               .requestStream(DefaultPayload.create(payload))
-              .doOnRequest(lc => {
-                println(s"consumer $lc requested a new item")
-
-                // ask for another
-                pull(in)
-              })
+              .doOnRequest(_ => pull(in))
               .doOnError(e => println(s"error ${e.getCause}"))
               .onErrorStop()
-              .blockFirst()
+              .publishOn(Schedulers.boundedElastic())
           }
 
           override def onUpstreamFinish(): Unit = {

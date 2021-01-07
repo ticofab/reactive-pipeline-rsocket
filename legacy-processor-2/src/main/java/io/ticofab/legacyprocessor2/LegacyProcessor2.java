@@ -30,10 +30,13 @@ public class LegacyProcessor2 {
                     // publish to destination topic
                     kafkaProducer.send(new ProducerRecord<String, String>("SecondTopic", data));
 
+                    // when we return this, we signal that we are ready to process
+                    // the next item, conforming to the Reactive Streams standard.
                     return Flux.empty();
                 }
         );
 
+        // create a RSocket server to accept items from upstream.
         var server = RSocketServer
                 .create(acceptorRS)
                 .payloadDecoder(PayloadDecoder.ZERO_COPY)
@@ -57,6 +60,11 @@ public class LegacyProcessor2 {
 
     }
 
+    /**
+     * Consfigures and instantiates a KafkaProducer object.
+     *
+     * @return The KafkaProducer object.
+     */
     private static KafkaProducer<String, String> getKafkaProducer() {
         // Set up client Java properties
         Properties props = new Properties();
@@ -85,6 +93,7 @@ public class LegacyProcessor2 {
         }
     }
 
+    // a simple shortcut println method
     private static void log(String s) {
         System.out.println(s);
     }
