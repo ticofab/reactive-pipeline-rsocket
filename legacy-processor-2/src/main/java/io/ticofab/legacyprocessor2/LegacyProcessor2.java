@@ -25,7 +25,7 @@ public class LegacyProcessor2 {
                     log("received data in stream: " + data);
 
                     // simulate some work
-                    keepBusy();
+                    doSomeProcessing();
 
                     // publish to destination topic
                     kafkaProducer.send(new ProducerRecord<String, String>("SecondTopic", data));
@@ -51,7 +51,7 @@ public class LegacyProcessor2 {
 
         // make the program wait for us before running to completion.
         try {
-            Thread.sleep(100000);
+            Thread.sleep(1000000);
             log("Timer expired. I'm outta here!");
             server.dispose();
         } catch (InterruptedException e) {
@@ -68,12 +68,9 @@ public class LegacyProcessor2 {
     private static KafkaProducer<String, String> getKafkaProducer() {
         // Set up client Java properties
         Properties props = new Properties();
-        props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "localhost:9092");
-        props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                StringSerializer.class.getName());
-        props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                StringSerializer.class.getName());
+        props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.setProperty(ProducerConfig.ACKS_CONFIG, "1");
         return new KafkaProducer<>(props);
     }
@@ -83,9 +80,9 @@ public class LegacyProcessor2 {
     /**
      * Keeps the machine busy for a random number of seconds between 1 and 3
      */
-    private static void keepBusy() {
+    private static void doSomeProcessing() {
         var seconds = random.nextInt(3) + 1;
-        log("keeping busy for " + seconds + " seconds.");
+        log("processing item for " + seconds + " seconds.");
         try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {

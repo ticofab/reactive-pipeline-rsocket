@@ -48,7 +48,7 @@ class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkSh
               .doOnRequest(_ => pull(in))
               .doOnError(e => println(s"error ${e.getCause}"))
               .onErrorStop()
-              .publishOn(Schedulers.boundedElastic())
+              .blockFirst()
           }
 
           override def onUpstreamFinish(): Unit = {

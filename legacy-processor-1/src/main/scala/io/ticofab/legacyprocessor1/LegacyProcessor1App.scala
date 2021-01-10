@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream.scaladsl.Sink
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 
@@ -11,7 +12,7 @@ object LegacyProcessor1App extends App {
 
   println("Legacy Processor 1 starting.")
   implicit val actorSystem = ActorSystem("legacyProcessor1")
-  val config = actorSystem.settings.config.getConfig("our-kafka-consumer")
+  val config               = actorSystem.settings.config.getConfig("our-kafka-consumer")
 
   // settings to consume from a kafka topic
   val consumerSettings  = ConsumerSettings(config, new StringDeserializer, new StringDeserializer)
@@ -23,10 +24,14 @@ object LegacyProcessor1App extends App {
   // connects to a running kafka topics and consumes from there
   Consumer
     .plainSource(consumerSettings, kafkaSubscription)
-    .map(msg => {
-      println(s"read message from kafka: ${msg.value} at offset ${msg.offset}")
-      msg.value.getBytes
-    })
+    .map(processItem)
+    .map(_.getBytes)
     .to(rSocketSink)
     .run()
+
+  // simulates processing of an item received from the topic
+  def processItem(msg: ConsumerRecord[String, String]) = {
+    println(s"read message from kafka: ${msg.value} at offset ${msg.offset}")
+    msg.value
+  }
 }
