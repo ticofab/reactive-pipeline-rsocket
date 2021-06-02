@@ -6,7 +6,6 @@ import io.rsocket._
 import io.rsocket.core._
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util._
-import reactor.core.scheduler.Schedulers
 import reactor.util.retry.Retry
 
 import java.time.Duration

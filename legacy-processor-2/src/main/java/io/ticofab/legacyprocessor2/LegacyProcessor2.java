@@ -22,7 +22,7 @@ public class LegacyProcessor2 {
         var acceptorRS = SocketAcceptor.forRequestStream(
                 payload -> {
                     String data = payload.getDataUtf8();
-                    log("received data in stream: " + data);
+                    log("received from RSocket: '" + data + "'");
 
                     // simulate some work
                     doSomeProcessing();
@@ -81,13 +81,9 @@ public class LegacyProcessor2 {
      * Keeps the machine busy for a random number of seconds between 1 and 3
      */
     private static void doSomeProcessing() {
-        var seconds = random.nextInt(3) + 1;
+        var seconds = random.nextInt(4) + 1;
         log("processing item for " + seconds + " seconds.");
-        try {
-            Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        try { Thread.sleep(seconds * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
     }
 
     // a simple shortcut println method

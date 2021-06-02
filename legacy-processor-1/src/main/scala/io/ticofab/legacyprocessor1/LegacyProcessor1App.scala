@@ -11,14 +11,14 @@ import org.apache.kafka.common.serialization.StringDeserializer
 object LegacyProcessor1App extends App {
 
   println("Legacy Processor 1 starting.")
-  implicit val actorSystem = ActorSystem("legacyProcessor1")
-  val config               = actorSystem.settings.config.getConfig("our-kafka-consumer")
+  implicit val actorSystem: ActorSystem = ActorSystem("legacyProcessor1")
 
   // settings to consume from a kafka topic
+  val config            = actorSystem.settings.config.getConfig("our-kafka-consumer")
   val consumerSettings  = ConsumerSettings(config, new StringDeserializer, new StringDeserializer)
   val kafkaSubscription = Subscriptions.assignmentWithOffset(new TopicPartition("FirstTopic", 0), 0)
 
-  // the rsocket sink that will propagate items downstream
+  // the RSocket sink that will propagate items downstream
   val rSocketSink = Sink.fromGraph(new RSocketSink(7000))
 
   // connects to a running kafka topics and consumes from there
@@ -31,7 +31,7 @@ object LegacyProcessor1App extends App {
 
   // simulates processing of an item received from the topic
   def processItem(msg: ConsumerRecord[String, String]) = {
-    println(s"read message from kafka: ${msg.value} at offset ${msg.offset}")
+    println(s"read from kafka: '${msg.value}' at offset ${msg.offset}")
     msg.value
   }
 }
