@@ -19,16 +19,17 @@ public class LegacyProcessor2 {
         log("starting legacy processor 2");
         KafkaProducer<String, String> kafkaProducer = getKafkaProducer();
 
+        // define the behaviour upon receiving data from the RSocket source
         var acceptorRS = SocketAcceptor.forRequestStream(
                 payload -> {
                     String data = payload.getDataUtf8();
                     log("received from RSocket: '" + data + "'");
 
-                    // simulate some work
-                    doSomeProcessing();
+                    // encapsulates some legacy processing logic
+                    String processedData = doSomeProcessing(data);
 
                     // publish to destination topic
-                    kafkaProducer.send(new ProducerRecord<String, String>("SecondTopic", data));
+                    kafkaProducer.send(new ProducerRecord<String, String>("SecondTopic", processedData));
 
                     // when we return this, we signal that we are ready to process
                     // the next item, conforming to the Reactive Streams standard.
@@ -80,10 +81,16 @@ public class LegacyProcessor2 {
     /**
      * Keeps the machine busy for a random number of seconds between 1 and 3
      */
-    private static void doSomeProcessing() {
-        var seconds = random.nextInt(4) + 1;
-        log("processing item for " + seconds + " seconds.");
-        try { Thread.sleep(seconds * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
+    private static String doSomeProcessing(String data) {
+        try {
+            var seconds = random.nextInt(4) + 1;
+            Thread.sleep(seconds * 1000);
+            log("received " + data + " and processed for " + seconds + " seconds.");
+            return data + "-twice";
+        } catch (InterruptedException e) {
+            // something went wrong while processing, signal it downstream
+            return data + "-then-failed";
+        }
     }
 
     // a simple shortcut println method

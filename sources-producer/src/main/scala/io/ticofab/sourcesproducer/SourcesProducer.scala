@@ -7,7 +7,7 @@ import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-import java.time.{LocalDateTime, LocalTime}
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.DurationInt
 
@@ -24,7 +24,7 @@ object SourcesProducer extends App {
     .tick(1.second, 1.second, ())
     .map(_ => LocalTime.now.format(formatter))
     .map(now => {
-      val msg = "Message sent at " + now
+      val msg = "message-created-at-" + now
       println(msg)
       new ProducerRecord[String, String]("FirstTopic", msg)
     })

@@ -10,12 +10,12 @@ import reactor.util.retry.Retry
 
 import java.time.Duration
 
-class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkShape[Array[Byte]]] {
+class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkShape[String]] {
 
-  val in: Inlet[Array[Byte]] = Inlet("RSocketSinkInput")
-  var socket: RSocket        = null // Use Optional or something like that
+  val in: Inlet[String] = Inlet("RSocketSinkInput")
+  var socket: RSocket   = null // don't use null in prod!
 
-  override def shape: SinkShape[Array[Byte]] = SinkShape(in)
+  override def shape: SinkShape[String] = SinkShape(in)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
@@ -42,7 +42,7 @@ class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkSh
             val payload = grab(in)
 
             // do operation
-            val ss = socket
+            socket
               .requestStream(DefaultPayload.create(payload))
               .doOnRequest(_ => pull(in))
               .doOnError(e => println(s"error ${e.getCause}"))

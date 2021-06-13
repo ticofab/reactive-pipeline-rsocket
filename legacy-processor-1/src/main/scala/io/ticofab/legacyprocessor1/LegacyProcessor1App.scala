@@ -24,14 +24,19 @@ object LegacyProcessor1App extends App {
   // connects to a running kafka topics and consumes from there
   Consumer
     .plainSource(consumerSettings, kafkaSubscription)
+
+    // process one item (this encapsulates our legacy logic
     .map(processItem)
-    .map(_.getBytes)
+
+    // push the outcome of the processing
     .to(rSocketSink)
+
+    // triggers execution of the stream we built
     .run()
 
   // simulates processing of an item received from the topic
   def processItem(msg: ConsumerRecord[String, String]) = {
     println(s"read from kafka: '${msg.value}' at offset ${msg.offset}")
-    msg.value
+    msg.value + "-processed-once"
   }
 }
