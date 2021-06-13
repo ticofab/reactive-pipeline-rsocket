@@ -29,7 +29,8 @@ class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkSh
           .block
         println("socket connected")
 
-        // ask for an element as soon as you start
+        // Akka Streams semantics: ask an element as soon as you start.
+        //   'pull' tells upstream that we have capacity to handle the next item.
         pull(in)
       }
 
@@ -38,7 +39,8 @@ class RSocketSink(port: Int, host: String = "0.0.0.0") extends GraphStage[SinkSh
         new InHandler {
           override def onPush(): Unit = {
 
-            // grab the value from the buffer
+            // Akka Streams semantics: 'grab' returns the last item that has
+            //   been pulled (see above) so that we can do something with it.
             val payload = grab(in)
 
             // do operation
