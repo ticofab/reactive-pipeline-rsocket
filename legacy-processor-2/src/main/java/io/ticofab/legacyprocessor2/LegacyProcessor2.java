@@ -23,7 +23,6 @@ public class LegacyProcessor2 {
         var acceptorRS = SocketAcceptor.forRequestStream(
                 payload -> {
                     String data = payload.getDataUtf8();
-                    log("received from RSocket: '" + data + "'");
 
                     // encapsulates some legacy processing logic
                     String processedData = doSomeProcessing(data);
