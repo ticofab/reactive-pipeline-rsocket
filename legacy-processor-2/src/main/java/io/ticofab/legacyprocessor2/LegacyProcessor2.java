@@ -82,9 +82,9 @@ public class LegacyProcessor2 {
      */
     private static String doSomeProcessing(String data) {
         try {
-            var seconds = random.nextInt(4) + 1;
+            var seconds = random.nextDouble() > 0.8 ? 5 : 1;
+            log("received " + data + " and processing for " + seconds + " seconds.");
             Thread.sleep(seconds * 1000);
-            log("received " + data + " and processed for " + seconds + " seconds.");
             return data + "-twice";
         } catch (InterruptedException e) {
             // something went wrong while processing, signal it downstream

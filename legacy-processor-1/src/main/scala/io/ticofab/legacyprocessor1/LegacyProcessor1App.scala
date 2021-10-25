@@ -37,6 +37,10 @@ object LegacyProcessor1App extends App {
   // simulates processing of an item received from the topic
   def processItem(msg: ConsumerRecord[String, String]) = {
     println(s"read from kafka: '${msg.value}' at offset ${msg.offset}")
-    msg.value + "-processed-once"
+    receivedElements += 1
+    "message-" + receivedElements
   }
+
+  // keep track of received elements
+  var receivedElements = 0
 }
